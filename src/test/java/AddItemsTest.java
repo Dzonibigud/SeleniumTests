@@ -75,53 +75,51 @@ public class AddItemsTest {
         bag.get(0).click();
         Thread.sleep(3000);
     }
+
     @Test
     void addMenJeansItemTest() throws InterruptedException {
-        int productNumber = 19;
+        int productNumber = 0;
         driver.get(BASE_URL);
         driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         Actions action = new Actions(driver);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loading-spinner-id")));
+        WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        longWait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loading-spinner-id")));
         Thread.sleep(5000);
         List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
-        if (popUpClose.size() > 0) {
+        if (!popUpClose.isEmpty()) {
             popUpClose.get(0).click();
         }
-        WebElement menCategory = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@data-text='Men']")));
+        WebElement menCategory = driver.findElement(By.xpath("//a[@data-text='Men']"));
         action.moveToElement(menCategory).perform();
-        WebElement jeans = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@data-text='Men']/..//a[@data-item-link and text() = 'Jeans']")));
+        WebElement jeans = driver.findElement(By.xpath("//a[@data-text='Men']/..//a[@data-item-link and text() = 'Jeans']"));
         jeans.click();
-        //Thread.sleep(2000);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h1[contains(text(), 'Jeans')]")));
-        List<WebElement> scrollToJeans = driver.findElements(By.xpath("//div[@data-product-id]"));
-        action.scrollToElement(scrollToJeans.get(productNumber)).perform();
-        wait.until(ExpectedConditions.visibilityOf(scrollToJeans.get(productNumber)));
-        action.moveToElement(scrollToJeans.get(productNumber)).perform();
-        String id = scrollToJeans.get(productNumber).getAttribute("data-product-id");
-        System.out.println(id);
-        //Thread.sleep(2000);
-        WebElement item = driver.findElement(By.xpath("//div[@data-product-id='" + id + "']"));
-        WebElement quickShop = item.findElement(By.xpath(".//a[text() = 'Quick Shop']"));
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.xpath("//div[@data-product-id='" + id + "']"), "Quick Shop"));
+        longWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h1[contains(text(), 'Jeans')]")));
+        List<WebElement> products = driver.findElements(By.xpath("//div[@data-product-id]"));
+        action.moveToElement(products.get(productNumber)).perform();
+        String id = products.get(productNumber).getAttribute("data-product-id");
+        String productName = products.get(productNumber).findElement(By.xpath(".//h3[@data-product-name]")).getText();
+        System.out.println("ProductId = " + id);
+        System.out.println("ProductName = " + productName);
+        WebElement firstProduct = products.get(0);
+        WebElement quickShop = firstProduct.findElement(By.xpath(".//a[text() = 'Quick Shop']"));
         quickShop.click();
-        //Thread.sleep(2000);
-        WebElement size = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[@class ='dropdown-text']")));
-        size.click();
-        //Thread.sleep(1000);
+        //it's necessary to add this step to wait until the QuickShop menu fully loaded before click at size
+        longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[@data-test-product-name]"), productName));
+        WebElement sizeButton = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@data-test-dropdown-toggle]")));
+        sizeButton.click();
         List<WebElement> sizeOfJeans = driver.findElements(By.xpath("//li[@data-value]"));
-        for (WebElement product : sizeOfJeans) {
-            if (!product.getText().contains("Out of Stock Online")) {
-                product.click();
+        for (WebElement size : sizeOfJeans) {
+            if (!size.getText().contains("Out of Stock Online")) {
+                size.click();
                 break;
             }
         }
         Thread.sleep(2000);
-        WebElement addToBag = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@name = 'add-to-bag']")));
+        WebElement addToBag = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@name = 'add-to-bag']")));
         action.moveToElement(addToBag);
-        Thread.sleep(1000);
         addToBag.click();
-        Thread.sleep(2000);
         WebElement inTheBag = driver.findElement(By.xpath("//h2[text() = 'Added to bag!']"));
         String result = inTheBag.getText();
         Assertions.assertEquals("Added to bag!", result);
