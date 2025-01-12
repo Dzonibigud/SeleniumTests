@@ -45,7 +45,7 @@ public class AddItemsTest {
         Actions action = new Actions(driver);
         Thread.sleep(5000);
         List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
-        if(popUpClose.size() > 0){
+        if(!popUpClose.isEmpty()){
             popUpClose.get(0).click();
         }
         WebElement womenCategory = driver.findElement(By.cssSelector("a[data-text = 'Women']"));
@@ -84,7 +84,7 @@ public class AddItemsTest {
         WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(5));
         Thread.sleep(5000);
         List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
-        if (popUpClose.size() > 0) {
+        if (!popUpClose.isEmpty()) {
             popUpClose.get(0).click();
         }
         WebElement menCategory = driver.findElement(By.xpath("//a[@data-text='Men']"));
