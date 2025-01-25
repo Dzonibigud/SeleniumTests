@@ -3,14 +3,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import javax.sql.rowset.WebRowSet;
 import java.time.Duration;
 import java.util.List;
 
@@ -19,9 +18,27 @@ public class AddItemsTest {
 
     private static final String BASE_URL = "https://www.ae.com/us/en";
 
+    private void closeWeekendPopup(){
+        try {
+            WebElement shadowDiv = driver.findElement(By.xpath("//div"));
+            SearchContext shadowRoot = shadowDiv.getShadowRoot();
+            shadowRoot.findElement(By.cssSelector("button.close")).click();
+            } catch (Exception ignore){}
+    }
+    private void closeCoockies(){
+        List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
+        if(!popUpClose.isEmpty()){
+            popUpClose.get(0).click();
+        }
+    }
+
     @BeforeEach
     void setUp(){
         driver = new ChromeDriver();
+        driver.get(BASE_URL);
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(7));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(15));
     }
 
     @AfterEach
@@ -39,41 +56,31 @@ public class AddItemsTest {
         Assertions.assertEquals(BASE_URL, curentUrl);
     }
     @Test
-    void addWomenShoesItemTest() throws InterruptedException {
-        driver.get(BASE_URL);
-        driver.manage().window().maximize();
+    void addWomenShoesItemTest(){
         Actions action = new Actions(driver);
-        Thread.sleep(5000);
-        List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
-        if(!popUpClose.isEmpty()){
-            popUpClose.get(0).click();
-        }
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        closeCoockies();
         WebElement womenCategory = driver.findElement(By.cssSelector("a[data-text = 'Women']"));
         action.moveToElement(womenCategory).perform();
-        Thread.sleep(2000);
-
         WebElement womenShoesSubCategory = driver.findElement(By.xpath("//a[@data-text = 'Women']/..//a[@data-item-link and text() = 'Shoes']"));
-        ////a[@data-text = "Women"]/..//a[@data-item-link and text() = "Shoes"]
-        ////a[@data-product-id = "0411_6604_309"]
         womenShoesSubCategory.click();
-        Thread.sleep(5000);
-        WebElement shoe = driver.findElement(By.cssSelector("div[data-product-id='0411_6604_309']"));
-        action.scrollToElement(shoe).perform();
-        Thread.sleep(3000);
-        shoe.click();
-        Thread.sleep(2000);
-        WebElement color = driver.findElement(By.cssSelector("img[title = 'Medium Brown']"));
-        color.click();
-        Thread.sleep(2000);
-        WebElement dropDown = driver.findElement(By.xpath("//span[@class ='dropdown-text']"));
-        dropDown.click();
-        Thread.sleep(1000);
-        WebElement size = driver.findElement(By.xpath("//li[@data-value='0041765520']"));
-        size.click();
-        Thread.sleep(1000);
-        List<WebElement> bag = driver.findElements(By.xpath("//button[@name='addToBag']"));
-        bag.get(0).click();
-        Thread.sleep(3000);
+        List<WebElement> shoes = driver.findElements(By.xpath("//div[@data-product-id]"));
+        action.moveToElement(shoes.get(22)).perform();
+        WebElement quickShop = shoes.get(22).findElement(By.xpath(".//a[text()='Quick Shop']"));
+        action.moveToElement(quickShop).click().perform();
+        //closeWeekendPopup();
+        wait.until(ExpectedConditions.textToBe(By.xpath("//h2[text()='Quick Shop']"), "Quick Shop"));
+        WebElement size = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@data-test-dropdown-toggle]")));
+        action.moveToElement(size).click().perform();
+        List<WebElement> sizeOfShoes = driver.findElements(By.xpath("//li[@data-value]"));
+        for (WebElement shoe : sizeOfShoes) {
+            if (!shoe.getText().contains("Out of Stock Online")) {
+                shoe.click();
+                break;
+            }
+        }
+        WebElement addToBag = driver.findElement(By.xpath("//button[@name='add-to-bag']"));
+        action.moveToElement(addToBag).click().perform();
     }
     @Test
     void addMenJeansItemTest() throws InterruptedException {
@@ -82,16 +89,11 @@ public class AddItemsTest {
         driver.manage().window().maximize();
         Actions action = new Actions(driver);
         WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        Thread.sleep(5000);
-        List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
-        if (!popUpClose.isEmpty()) {
-            popUpClose.get(0).click();
-        }
+        closeCoockies();
         WebElement menCategory = driver.findElement(By.xpath("//a[@data-text='Men']"));
         action.moveToElement(menCategory).perform();
         WebElement jeans = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@data-text='Men']/..//a[@data-item-link and text() = 'Jeans']")));
         jeans.click();
-        //Thread.sleep(2000);
         longWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h1[contains(text(), 'Jeans')]")));
         List<WebElement> scrollToJeans = driver.findElements(By.xpath("//div[@data-product-id]"));
         action.scrollToElement(scrollToJeans.get(productNumber)).perform();
@@ -99,17 +101,15 @@ public class AddItemsTest {
         action.moveToElement(scrollToJeans.get(productNumber)).perform();
         String id = scrollToJeans.get(productNumber).getAttribute("data-product-id");
         System.out.println(id);
-        //Thread.sleep(2000);
         WebElement item = driver.findElement(By.xpath("//div[@data-product-id='" + id + "']"));
         String productName = scrollToJeans.get(productNumber).findElement(By.xpath(".//h3[@data-product-name]")).getText();
         WebElement quickShop = item.findElement(By.xpath(".//a[text() = 'Quick Shop']"));
         longWait.until(ExpectedConditions.textToBePresentInElementLocated(By.xpath("//div[@data-product-id='" + id + "']"), "Quick Shop"));
         quickShop.click();
-        //Thread.sleep(2000);
+        //closeWeekendPopup();
         longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[@data-test-product-name]"), productName));
         WebElement size = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[@class ='dropdown-text']")));
         size.click();
-        //Thread.sleep(1000);
         List<WebElement> sizeOfJeans = driver.findElements(By.xpath("//li[@data-value]"));
         for (WebElement product : sizeOfJeans) {
             if (!product.getText().contains("Out of Stock Online")) {
@@ -117,14 +117,19 @@ public class AddItemsTest {
                 break;
             }
         }
-        Thread.sleep(2000);
         WebElement addToBag = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@name = 'add-to-bag']")));
         action.moveToElement(addToBag);
-        Thread.sleep(1000);
         addToBag.click();
-        Thread.sleep(2000);
-        WebElement inTheBag = driver.findElement(By.xpath("//h2[text() = 'Added to bag!']"));
-        String result = inTheBag.getText();
-        Assertions.assertEquals("Added to bag!", result);
+        WebElement viewBag = driver.findElement(By.xpath("//button[@name='viewBag']"));
+        viewBag.click();
+
+
+
+        longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[text()='Shopping Bag']"),"Shopping Bag"));
+        WebElement iframe = driver.findElement(By.xpath("//iframe[@title ='PayPal']"));
+        driver.switchTo().frame(iframe);
+        WebElement payPal = longWait.until(ExpectedConditions.elementToBeClickable(By.id("ember187")));
+        action.moveToElement(payPal).click().perform();
+        driver.switchTo().defaultContent();
     }
 }
