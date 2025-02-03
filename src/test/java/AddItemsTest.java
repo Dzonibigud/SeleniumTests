@@ -56,7 +56,7 @@ public class AddItemsTest {
         Assertions.assertEquals(BASE_URL, curentUrl);
     }
     @Test
-    void addWomenShoesItemTest(){
+    void addWomenShoesItemTest() throws InterruptedException {
         Actions action = new Actions(driver);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         closeCoockies();
@@ -68,9 +68,12 @@ public class AddItemsTest {
         action.moveToElement(shoes.get(22)).perform();
         WebElement quickShop = shoes.get(22).findElement(By.xpath(".//a[text()='Quick Shop']"));
         action.moveToElement(quickShop).click().perform();
-        //closeWeekendPopup();
-        wait.until(ExpectedConditions.textToBe(By.xpath("//h2[text()='Quick Shop']"), "Quick Shop"));
-        WebElement size = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@data-test-dropdown-toggle]")));
+        Thread.sleep(3000);
+        closeWeekendPopup();
+        Thread.sleep(3000);
+        //wait.until(ExpectedConditions.textToBe(By.xpath("//h2[text()='Quick Shop']"), "Quick Shop"));
+        WebElement size = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[@class ='dropdown-text']")));
+        //size.click();
         action.moveToElement(size).click().perform();
         List<WebElement> sizeOfShoes = driver.findElements(By.xpath("//li[@data-value]"));
         for (WebElement shoe : sizeOfShoes) {
@@ -84,7 +87,7 @@ public class AddItemsTest {
     }
     @Test
     void addMenJeansItemTest() throws InterruptedException {
-        int productNumber = 28;
+        int productNumber = 15;
         driver.get(BASE_URL);
         driver.manage().window().maximize();
         Actions action = new Actions(driver);
@@ -106,8 +109,10 @@ public class AddItemsTest {
         WebElement quickShop = item.findElement(By.xpath(".//a[text() = 'Quick Shop']"));
         longWait.until(ExpectedConditions.textToBePresentInElementLocated(By.xpath("//div[@data-product-id='" + id + "']"), "Quick Shop"));
         quickShop.click();
-        //closeWeekendPopup();
         longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[@data-test-product-name]"), productName));
+        Thread.sleep(3000);
+        closeWeekendPopup();
+        Thread.sleep(3000);
         WebElement size = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[@class ='dropdown-text']")));
         size.click();
         List<WebElement> sizeOfJeans = driver.findElements(By.xpath("//li[@data-value]"));
@@ -128,8 +133,9 @@ public class AddItemsTest {
         longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[text()='Shopping Bag']"),"Shopping Bag"));
         WebElement iframe = driver.findElement(By.xpath("//iframe[@title ='PayPal']"));
         driver.switchTo().frame(iframe);
-        WebElement payPal = longWait.until(ExpectedConditions.elementToBeClickable(By.id("ember187")));
-        action.moveToElement(payPal).click().perform();
-        driver.switchTo().defaultContent();
+        WebElement payPal = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@role='link']")));
+        new Actions(driver).moveToElement(payPal).perform();
+        Thread.sleep(500);
+        payPal.click();
     }
 }
