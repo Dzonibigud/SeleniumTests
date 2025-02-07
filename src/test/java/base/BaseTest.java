@@ -1,10 +1,8 @@
 package base;
 
-
-import org.junit.After;
-import org.junit.Before;
 import org.openqa.selenium.WebDriver;
-import utils.ConfigReader;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import utils.WebDriverFactory;
 
 import java.time.Duration;
@@ -12,7 +10,7 @@ import java.time.Duration;
 public class BaseTest {
     protected WebDriver driver;
 
-    @Before
+    @BeforeMethod
     public void setUp(){
         driver = WebDriverFactory.getDriver();
         driver.manage().window().maximize();
@@ -20,7 +18,7 @@ public class BaseTest {
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(15));
         driver.get("https://www.ae.com/us/en");
     }
-    @After
+    @AfterMethod
     public void tearDown(){
         WebDriverFactory.quitDriver();
     }

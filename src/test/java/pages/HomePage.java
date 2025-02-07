@@ -14,53 +14,26 @@ import utils.WebDriverFactory;
 import java.time.Duration;
 import java.util.List;
 
-public class HomePage extends BaseTest {
-    private WebDriver driver;
+public class HomePage {
+    protected WebDriver driver;
     private WebDriverWait wait;
+    private Actions actions;
 
-    private List<WebElement> accptButton = driver.findElements(By.id("onetrust-accept-btn-handler"));
-
-    @FindBy(xpath = "//a[@data-text='Men']")
-    private WebElement menCategory;
-
-    @FindBy(xpath = "//a[@data-text='Women']")
-    private WebElement womenCategory;
-
-    @FindBy(xpath = "//a[@data-text='Jeans']")
-    private WebElement jeansCategory;
-
-    @FindBy(xpath = "//a[@data-text='Men']/..//a[@data-item-link and text() = 'Jeans']")
-    private WebElement menSubCategoryJeans;
-
-
-    public HomePage(WebDriver driver){
+    public HomePage(WebDriver driver) {
         this.driver = driver;
+        this.actions = new Actions(driver);
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        PageFactory.initElements(driver,this);
     }
-    public void navigatgeToMenCategory(){
-        Actions action = new Actions(driver);
-        wait.until(ExpectedConditions.elementToBeClickable(menCategory));
-        action.moveToElement(menCategory).perform();
+    protected void click(WebElement element) {
+        wait.until(ExpectedConditions.elementToBeClickable(element)).click();
     }
-    public void navigatgeToWomenCategory(){
-        Actions action = new Actions(driver);
-        wait.until(ExpectedConditions.elementToBeClickable(womenCategory));
-        action.moveToElement(womenCategory).perform();
+    protected void moveToElement(WebElement element){
+        actions.moveToElement(wait.until(ExpectedConditions.elementToBeClickable(element))).perform();
     }
-    public void navigatgeToJeansCategory(){
-        Actions action = new Actions(driver);
-        wait.until(ExpectedConditions.elementToBeClickable(jeansCategory));
-        action.moveToElement(jeansCategory).perform();
+    protected void scroleToElement(WebElement element){
+        actions.scrollToElement(wait.until(ExpectedConditions.elementToBeClickable(element))).perform();
     }
-    public void navigateToMenSubCategoryJeans(){
-        Actions action = new Actions(driver);
-        wait.until(ExpectedConditions.elementToBeClickable(menSubCategoryJeans));
-        action.moveToElement(menSubCategoryJeans).click().perform();
-    }
-    public void closeCoockies(){
-        if(!accptButton.isEmpty()){
-            accptButton.get(0).click();
-        }
+    protected String getText(WebElement element) {
+        return wait.until(ExpectedConditions.visibilityOf(element)).getText();
     }
 }
