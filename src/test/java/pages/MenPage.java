@@ -5,11 +5,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import java.util.List;
-
-public class MenPage extends HomePage {
-    protected WebDriver driver;
-
+public class MenPage extends BasePage {
     public MenPage(WebDriver driver) {
         super(driver);
         PageFactory.initElements(driver, this);
@@ -22,13 +18,13 @@ public class MenPage extends HomePage {
     @FindBy(xpath = "//a[@data-text='Men']/..//a[@data-item-link and text() = 'Jeans']") private WebElement menSubCategoryJeans;
 
     public void closeCookies(){
-            click(accptButton);
+            clickWithWait(accptButton);
     }
     public void navigateToMenCategory(){
         moveToElement(menCategory);
     }
     public void navigateToMenJeans(){
         moveToElement(menSubCategoryJeans);
-        click(menSubCategoryJeans);
+        clickWithWait(menSubCategoryJeans);
     }
 }
