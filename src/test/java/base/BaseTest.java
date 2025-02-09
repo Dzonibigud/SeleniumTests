@@ -1,8 +1,8 @@
 package base;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import utils.ConfigReader;
 import utils.WebDriverFactory;
 
@@ -11,17 +11,17 @@ import java.time.Duration;
 public class BaseTest {
     protected WebDriver driver;
 
-    @BeforeMethod
-    public void setUp(){
+    @BeforeEach
+    public void setUp() {
         driver = WebDriverFactory.getDriver();
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(7));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(15));
-        driver.get(ConfigReader.getProperty("AE.url"));
-        //driver.get("https://www.ae.com/us/en");
+//        driver.get(ConfigReader.getProperty("AE.url"));
     }
-    @AfterMethod
-    public void tearDown(){
+
+    @AfterEach
+    public void tearDown() {
         WebDriverFactory.quitDriver();
     }
 }

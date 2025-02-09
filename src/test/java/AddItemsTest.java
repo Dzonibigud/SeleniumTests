@@ -10,30 +10,32 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.time.Duration;
 import java.util.List;
 
 public class AddItemsTest {
+    private static final String BASE_URL = "https://www.ae.com/us/en";
     WebDriver driver;
 
-    private static final String BASE_URL = "https://www.ae.com/us/en";
-
-    private void closeWeekendPopup(){
+    private void closeWeekendPopup() {
         try {
             WebElement shadowDiv = driver.findElement(By.xpath("//div"));
             SearchContext shadowRoot = shadowDiv.getShadowRoot();
             shadowRoot.findElement(By.cssSelector("button.close")).click();
-            } catch (Exception ignore){}
+        } catch (Exception ignore) {
+        }
     }
-    private void closeCoockies(){
+
+    private void closeCoockies() {
         List<WebElement> popUpClose = driver.findElements(By.id("onetrust-accept-btn-handler"));
-        if(!popUpClose.isEmpty()){
+        if (!popUpClose.isEmpty()) {
             popUpClose.get(0).click();
         }
     }
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         driver = new ChromeDriver();
         driver.get(BASE_URL);
         driver.manage().window().maximize();
@@ -42,19 +44,20 @@ public class AddItemsTest {
     }
 
     @AfterEach
-    void tearDown() throws InterruptedException{
+    void tearDown() throws InterruptedException {
         Thread.sleep(2000);
         driver.quit();
     }
 
     @Test
-    void openHomePageTest(){
+    void openHomePageTest() {
         driver.get(BASE_URL);
         driver.manage().window().maximize();
         String curentUrl = driver.getCurrentUrl();
 
         Assertions.assertEquals(BASE_URL, curentUrl);
     }
+
     @Test
     void addWomenShoesItemTest() throws InterruptedException {
         Actions action = new Actions(driver);
@@ -85,6 +88,7 @@ public class AddItemsTest {
         WebElement addToBag = driver.findElement(By.xpath("//button[@name='add-to-bag']"));
         action.moveToElement(addToBag).click().perform();
     }
+
     @Test
     void addMenJeansItemTest() throws InterruptedException {
         int productNumber = 15;
@@ -129,8 +133,7 @@ public class AddItemsTest {
         viewBag.click();
 
 
-
-        longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[text()='Shopping Bag']"),"Shopping Bag"));
+        longWait.until(ExpectedConditions.textToBe(By.xpath("//h1[text()='Shopping Bag']"), "Shopping Bag"));
         WebElement iframe = driver.findElement(By.xpath("//iframe[@title ='PayPal']"));
         driver.switchTo().frame(iframe);
         WebElement payPal = longWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@role='link']")));

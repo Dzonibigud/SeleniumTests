@@ -1,39 +1,39 @@
 package pages;
 
-import base.BaseTest;
-import org.openqa.selenium.By;
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import utils.WebDriverFactory;
+import utils.ConfigReader;
 
-import java.time.Duration;
-import java.util.List;
-
-public class HomePage {
-    protected WebDriver driver;
-    private WebDriverWait wait;
-    private Actions actions;
+public class HomePage extends BasePage {
+    @FindBy(xpath = "//button[@id='onetrust-accept-btn-handler']")
+    private WebElement oneTrustCookieCloseButton;
+    @FindBy(xpath = "//a[@data-text='Men']")
+    private WebElement menCategory;
+    @FindBy(xpath = "//a[@data-text='Men']/..//a[@data-item-link and text() = 'Jeans']")
+    private WebElement menSubCategoryJeans;
 
     public HomePage(WebDriver driver) {
-        this.driver = driver;
-        this.actions = new Actions(driver);
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        super(driver);
+        PageFactory.initElements(driver, this);
     }
-    protected void click(WebElement element) {
-        wait.until(ExpectedConditions.elementToBeClickable(element)).click();
+
+    @Step("Open homepage")
+    public void open() {
+        driver.get(ConfigReader.getProperty("AE.url"));
     }
-    protected void moveToElement(WebElement element){
-        actions.moveToElement(wait.until(ExpectedConditions.elementToBeClickable(element))).perform();
+
+    @Step("Close cookies oneTrust popup")
+    public void closeCookies() {
+        clickWithWait(oneTrustCookieCloseButton);
     }
-    protected void scroleToElement(WebElement element){
-        actions.scrollToElement(wait.until(ExpectedConditions.elementToBeClickable(element))).perform();
-    }
-    protected String getText(WebElement element) {
-        return wait.until(ExpectedConditions.visibilityOf(element)).getText();
+
+    @Step("Open men's jeans subcategory")
+    public MenJeansPage navigateToMenJeans() {
+        moveToElement(menCategory);
+        clickWithWait(menSubCategoryJeans);
+        return new MenJeansPage(driver);
     }
 }
