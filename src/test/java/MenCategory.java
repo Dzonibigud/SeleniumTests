@@ -8,13 +8,17 @@ import pages.MenPage;
 public class MenCategory extends BaseTest {
     @Test
     public void testJeans() throws InterruptedException {
-        HomePage homePage = new HomePage(driver);
         MenPage menPage = new MenPage(driver);
         //Thread.sleep(5000);
         menPage.closeCookies();
         menPage.navigateToMenCategory();
         menPage.navigateToMenJeans();
         MenJeansPage menJeans = new MenJeansPage(driver);
-        menJeans.moveToProduct(12);
+        menJeans.moveToProduct(0);
+        Thread.sleep(1000);
+        menJeans.selectSizeOfJeans();
+        menJeans.addToBag();
+        menJeans.payPalButton();
+        Thread.sleep(2000);
     }
 }

@@ -18,16 +18,38 @@ public class MenJeansPage extends HomePage{
     }
 
     @FindBy(xpath = "//div[@data-product-id]") private List<WebElement> jeans;
-
-
+    @FindBy(xpath = "//div[@data-product-id='0112_6926_074']") private WebElement productLocator;
+    @FindBy(xpath = "//span[@class ='dropdown-text']") private WebElement size;
+    @FindBy(xpath = "//li[@data-value]") List<WebElement> sizeOfJeans;
+    @FindBy(xpath = "//button[@name = 'add-to-bag']") private WebElement addToBag;
+    @FindBy(xpath = "//button[@name='viewBag']")private WebElement viewBag;
+    @FindBy(xpath = "//iframe[@title ='PayPal']") private WebElement iFrame;
+    @FindBy(xpath = "//div[@role='link']")private WebElement payPal;
 
     public void moveToProduct(int pN){
         scroleToElement(jeans.get(pN));
         moveToElement(jeans.get(pN));
-        By productLocator = By.xpath("//div[@data-product-id='" + pN + "']");
-        WebElement item = driver.findElement(productLocator);
-        WebElement quickShop = item.findElement(By.xpath(".//a[text() = 'Quick Shop']"));
+        WebElement quickShop = productLocator.findElement(By.xpath(".//a[text() = 'Quick Shop']"));
         click(quickShop);
     }
-
+    public void selectSizeOfJeans(){
+        click(size);
+        for (WebElement product : sizeOfJeans) {
+            if (!product.getText().contains("Out of Stock Online")) {
+                product.click();
+                break;
+            }
+        }
+    }
+    public void addToBag(){
+        click(addToBag);
+        click(viewBag);
+    }
+    public void payPalButton() throws InterruptedException {
+        driver.switchTo().frame(iFrame);
+        scroleToElement(payPal);
+        moveToElement(payPal);
+        Thread.sleep(500);
+        click(payPal);
+    }
 }
